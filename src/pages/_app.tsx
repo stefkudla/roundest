@@ -1,28 +1,18 @@
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
-import { withTRPC } from "@trpc/next";
-import type { AppRouter } from "@/backend/router";
 
 function MyApp({ Component, pageProps }: AppProps) {
   return <Component {...pageProps} />;
 }
 
+import { withTRPC } from "@trpc/next";
+import type { AppRouter } from "@/backend/router";
+
 function getBaseUrl() {
-  if (typeof window !== "undefined") {
-    return "";
-  }
-  // reference for vercel.com
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`;
-  }
+  if (process.browser) return ""; // Browser should use current path
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`; // SSR should use vercel url
 
-  // reference for render.com
-  if (process.env.RENDER_INTERNAL_HOSTNAME) {
-    return `http://${process.env.RENDER_INTERNAL_HOSTNAME}:${process.env.PORT}`;
-  }
-
-  // assume localhost
-  return `http://localhost:${process.env.PORT ?? 3000}`;
+  return `http://localhost:${process.env.PORT ?? 3000}`; // dev SSR should use localhost
 }
 
 export default withTRPC<AppRouter>({
@@ -31,10 +21,12 @@ export default withTRPC<AppRouter>({
      * If you want to use SSR, you need to use the server's full URL
      * @link https://trpc.io/docs/ssr
      */
+    const url = `${getBaseUrl()}/api/trpc`;
+
     return {
-      url: `${getBaseUrl()}/api/trpc`,
+      url,
       /**
-       * @link https://react-query-v3.tanstack.com/reference/QueryClient
+       * @link https://react-query.tanstack.com/reference/QueryClient
        */
       // queryClientConfig: { defaultOptions: { queries: { staleTime: 60 } } },
     };
@@ -42,5 +34,5 @@ export default withTRPC<AppRouter>({
   /**
    * @link https://trpc.io/docs/ssr
    */
-  ssr: true,
+  ssr: false,
 })(MyApp);
