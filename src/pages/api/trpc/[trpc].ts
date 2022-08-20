@@ -1,10 +1,9 @@
 // src/pages/api/trpc/[trpc].ts
-import { createNextApiHandler } from "@trpc/server/adapters/next";
-import { appRouter } from "../../../server/router";
-import { createContext } from "../../../server/router/context";
+import { appRouter } from "@/backend/router";
+import * as trpcNext from "@trpc/server/adapters/next";
 
 // export API handler
-export default createNextApiHandler({
+export default trpcNext.createNextApiHandler({
   router: appRouter,
-  createContext: createContext,
+  createContext: () => null,
 });
